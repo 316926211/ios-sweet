@@ -1,24 +1,26 @@
 name: Build iOS for marble (Note12Turbo)
 on:
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install -y device-tree-compiler gcc-aarch64-linux-gnu python3 python3-pip img2simg
-      - name: Patch for SM7475 marble
-        run: |
-          git apply ./patches/marble-pac-disable.patch || echo "patch skip, manual adapt needed"
-          python3 ./tools/dtb_probe.py
-          python3 ./tools/mkadt-marble.py
-      - name: Build Image
+          sudo apt-get update -y
+          sudo apt-get install -y device-tree-compiler gcc-aarch64-linux-gnu make mkbootimg android-sdk-libsparse-utils
+
+      - name: Chmod script
+        run: chmod +x ./build-marble.sh
+
+      - name: Run build
         run: ./build-marble.sh
-      - name: Upload artifact
+
+      - name: Upload output
         uses: actions/upload-artifact@v4
         with:
-          name: marble-ios-bootimg
+          name: build-out
           path: out/
