@@ -9,14 +9,42 @@ python3 tools/mkadt-marble.py
 echo "==== Compile XNU Shim ===="
 make
 
-echo "==== Build osm0sis mkbootimg from source ===="
-git clone --depth=1 https://github.com/osm0sis/mkbootimg.git mkbootimg-src
-cd mkbootimg-src
-make
-cp mkbootimg ..
-cd ..
+echo "==== Build boot.img with simple python script ===="
+python3 - <<'PY'
+import struct
 
-echo "==== Build boot.img ===="
-./mkbootimg --kernel shim/Image --dtb out/marble.dtb -o out/boot.img
+PAGE_SIZE = 4096
+
+def pad(data, align):
+    pad_len = (align - (len(data) % align)) % align
+    return data + b'\x00' * pad_len
+
+with open("shim/Image", "rb") as f:
+    kernel = f.read()
+with open("out/marble.dtb", "rb") as f:
+    dtb = f.read()
+
+kernel = pad(kernel, PAGE_SIZE)
+dtb = pad(dtb, PAGE_SIZE)
+
+header = struct.pack(
+    "<8sI1024sIIIIII32sI",
+    b"ANDROID!",
+    1,
+    b"",
+    len(kernel),
+    PAGE_SIZE,
+    len(dtb),
+    PAGE_SIZE,
+    0, 0, 0,
+    b"",
+    PAGE_SIZE
+)
+header = pad(header, PAGE_SIZE)
+
+out = header + kernel + dtb
+with open("out/boot.img", "wb") as f:
+    f.write(out)
+PY
 
 echo "Done! Output: out/boot.img"
