@@ -28,18 +28,23 @@ with open("out/marble.dtb", "rb") as f:
 kernel = pad(kernel, PAGE_SIZE)
 dtb = pad(dtb, PAGE_SIZE)
 
+# Standard Android boot image header v0
+fmt = "<8sIIIIIIII16s512s32s1024s"
 header = struct.pack(
-    "<8sI1024sIIIIII32sI",
+    fmt,
     b"ANDROID!",
-    1,
-    b"",
     len(kernel),
+    0x80008000,
+    0,
+    0x81000000,
+    0,
+    0,
+    0x80000100,
     PAGE_SIZE,
-    len(dtb),
-    PAGE_SIZE,
-    0, 0, 0,
+    b"marble",
     b"",
-    PAGE_SIZE
+    b"\x00" * 32,
+    b""
 )
 header = pad(header, PAGE_SIZE)
 
