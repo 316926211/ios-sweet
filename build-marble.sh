@@ -9,7 +9,7 @@ python3 tools/mkadt-marble.py
 echo "==== Compile XNU Shim ===="
 make
 
-echo "==== Build boot.img ===="
-mkbootimg --kernel shim/Image --dtb out/marble.dtb -o out/boot.img
+echo "==== Skip mkbootimg for now ===="
+# mkbootimg --kernel shim/Image --dtb out/marble.dtb -o out/boot.img
 
-echo "Done! Output: out/boot.img"
+echo "Done! Output: out/marble.dtb , shim/elf , shim/Image"
