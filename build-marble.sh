@@ -5,6 +5,7 @@ mkdir -p out
 
 echo "==== Generate marble DTB ===="
 python3 tools/mkadt-marble.py
+dtc -I dts -O dtb -o out/marble.dtb out/marble.dts
 
 echo "==== Compile XNU Shim ===="
 make
