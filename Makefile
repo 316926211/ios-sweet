@@ -4,6 +4,8 @@ OBJCOPY := aarch64-linux-gnu-objcopy
 
 CFLAGS := -nostdlib -static -O2 -c
 
+all: shim/Image
+
 shim/elf: shim/main.c shim/link.ld
 	$(CC) $(CFLAGS) shim/main.c -o shim/main.o
 	$(LD) -T shim/link.ld shim/main.o -o shim/elf
